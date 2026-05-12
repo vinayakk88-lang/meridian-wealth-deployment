@@ -1,29 +1,30 @@
 # Core agent framework (LangChain v1 / LangGraph v1)
-langchain>=1.0,<2.0
-langchain-core>=1.0,<2.0
-langgraph>=1.0,<2.0
+langchain
+langchain-core
+langgraph
 
 # LLM + embeddings provider
-langchain-openai>=1.0,<2.0
-openai>=1.50.0
+langchain-openai
+openai
 
 # Community integrations (FAISS vectorstore, PyPDF loader)
-langchain-community>=0.3,<0.4
-langchain-text-splitters>=0.3,<0.4
+langchain-community
+langchain-text-splitters
 
 # Vector store + PDF parsing
-faiss-cpu>=1.8.0
-pypdf>=4.0.0
+faiss-cpu
+pypdf
 
 # Live web search tool
-langchain-tavily>=0.1,<0.2
-tavily-python>=0.5.0
+langchain-tavily
+tavily-python
 
 # FastAPI service layer
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-pydantic>=2.7.0
-pydantic-settings>=2.4.0
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+httpx
 
 # Config / env
-python-dotenv>=1.0.0
+python-dotenv

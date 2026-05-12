@@ -21,11 +21,28 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.agent_tools import build_tools
-from src.config import AGENT_MODEL, API_HOST, API_PORT, LOG_LEVEL, assert_required_keys
+from src.config import (
+    AGENT_MODEL,
+    API_HOST,
+    API_PORT,
+    CHUNK_OVERLAP,
+    CHUNK_SIZE,
+    EMBEDDING_MODEL,
+    LOG_LEVEL,
+    RETRIEVER_K,
+    assert_required_keys,
+)
 from src.database_queries import check_connection
 from src.rag_pipeline import get_or_build_vectorstore, get_retriever
-from src.react_agent import build_agent
-from src.schemas import ChatRequest, ChatResponse, HealthResponse, ToolCall
+from src.react_agent import SYSTEM_PROMPT, build_agent
+from src.schemas import (
+    AgentInfo,
+    ChatRequest,
+    ChatResponse,
+    HealthResponse,
+    ToolCall,
+    ToolInfo,
+)
 
 
 logging.basicConfig(
@@ -55,6 +72,7 @@ async def lifespan(app: FastAPI):
 
     app.state.agent = agent
     app.state.vectorstore = vectorstore
+    app.state.tools = tools
     logger.info("Startup complete ✅")
 
     yield
@@ -163,6 +181,29 @@ async def chat(req: ChatRequest, request: Request) -> ChatResponse:
         tool_calls=tool_calls,
         iteration_count=iteration_count,
         model=AGENT_MODEL,
+    )
+
+
+@app.get("/agent/info", response_model=AgentInfo)
+async def agent_info(request: Request) -> AgentInfo:
+    tools = getattr(request.app.state, "tools", None) or []
+    vectorstore = getattr(request.app.state, "vectorstore", None)
+    doc_count = vectorstore.index.ntotal if vectorstore is not None else None
+
+    return AgentInfo(
+        model=AGENT_MODEL,
+        embedding_model=EMBEDDING_MODEL,
+        tools=[
+            ToolInfo(name=t.name, description=(t.description or "").strip())
+            for t in tools
+        ],
+        rag={
+            "chunk_size": CHUNK_SIZE,
+            "chunk_overlap": CHUNK_OVERLAP,
+            "retriever_k": RETRIEVER_K,
+        },
+        vectorstore_docs=doc_count,
+        system_prompt=SYSTEM_PROMPT,
     )
 
 

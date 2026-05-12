@@ -65,3 +65,19 @@ class HealthResponse(BaseModel):
     db_connected: bool
     vectorstore_loaded: bool
     tavily_configured: bool
+
+
+# --- /agent/info ---------------------------------------------------------
+
+class ToolInfo(BaseModel):
+    name: str
+    description: str
+
+
+class AgentInfo(BaseModel):
+    model: str
+    embedding_model: str
+    tools: list[ToolInfo]
+    rag: dict[str, int]
+    vectorstore_docs: int | None = None
+    system_prompt: str
